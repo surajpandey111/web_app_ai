@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI for Everyday Work</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script defer src="{{ url_for('static', filename='js/scripts.js')}}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="gate-container">
+        <div id="gate-left" class="gate"></div>
+        <div id="gate-right" class="gate"></div>
+        <div id="welcome-text">Welcome to AI For Everyday Work</div>
+    </div>
+            
+    <div class="container">
+        <h1>AI For Everyday Work</h1>
+        <div class="form-container">
+            <form id="chat-form" class="form-input">
+                <input type="text" name="prompt" id="prompt" placeholder="Enter your prompt here" required>
+                <button type="submit">Generate</button>
+            </form>
+            <form id="upload-form" class="form-input" enctype="multipart/form-data">
+                <input type="text" name="prompt" id="upload-prompt" placeholder="Enter your prompt here" required>
+                <input id="file-input" type="file" name="file" accept="image/*">
+                <button type="submit">Generate with Image</button>
+            </form>
+        </div>
+        <h2>SERVICES</h2>
+        <div id="chat-history">
+            {% for entry in chat_history %}
+            <div class="chat-entry">
+                <p><strong>You:</strong> {{ entry.user }}</p>
+                <p><strong>AI:</strong><pre>{{ entry.bot }}</pre></p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="image-modal" class="modal">
+        <span class="close" id="close-modal">&times;</span>
+        <img class="modal-content" alt="Image preview">
+    </div>
+    <footer>
+        <p>Developed by Suraj</p>
+    </footer>
+</body>
+</html>

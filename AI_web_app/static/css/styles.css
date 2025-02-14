@@ -1,0 +1,226 @@
+/* General body styling */
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: url('../background.png') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Allow page to expand with content */
+    overflow-x: hidden;
+    text-align: center;
+}
+
+
+/* Gate animation styling */
+#gate-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 10;
+    overflow: hidden;
+    transition: all 1s ease-in-out;
+}
+
+.gate {
+    width: 50%;
+    height: 100%;
+    background-color: #111;
+    position: absolute;
+    top: 0;
+    transition: transform 1s ease-in-out;
+    z-index: 10;
+}
+
+#gate-left {
+    left: 0;
+    transform: translateX(0);
+}
+
+#gate-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+#gate-container.gate-open #gate-left {
+    transform: translateX(-100%);
+}
+
+#gate-container.gate-open #gate-right {
+    transform: translateX(100%);
+}
+
+/* Welcome text inside the gate */
+#welcome-text {
+    color: #fff;
+    font-size: 3rem;
+    position: absolute;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    z-index: 11;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#gate-container.gate-open #welcome-text {
+    opacity: 0;
+}
+
+/* Content container */
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    width: 100%;
+    max-width: 1200px; /* Wider content area */
+    margin: 0 auto;
+    padding: 1rem;
+}
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    margin-top: 2rem;
+    color: chartreuse;
+    font-size: 1.75rem;
+}
+
+.form-container {
+    position: sticky;
+    top: 0; /* Keeps the form visible at the top */
+    z-index: 1; /* Ensure it stays above other elements */
+    background-color: rgba(0, 0, 0, 0.8); /* Adjust background if needed */
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+
+.form-input {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+}
+
+input[type="text"], button {
+    width: 100%;
+    max-width: 600px; /* Keep the text inputs constrained */
+    padding: 1rem;
+    font-size: 1.25rem;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+}
+
+input[type="text"] {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+
+button {
+    background-color: #673ab7;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #512da8;
+}
+
+/* Chat History */
+#chat-history {
+    max-height: 400px;       /* Set max height for vertical scroll */
+    overflow-y: auto;        /* Enable vertical scroll */
+    overflow-x: hidden;      /* Disable horizontal scroll */
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 1rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: none;         /* Ensure content fills container width */
+    margin: 1rem 0;
+    white-space: normal;     /* Allow text to wrap */
+    overflow-wrap: break-word;   /* Break long words */
+    word-wrap: break-word;       /* Ensure long text wraps */
+    word-break: break-all;       /* Break words at any point if necessary */
+    box-sizing: border-box;
+}
+
+
+
+
+.chat-entry {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1.1rem;
+    word-wrap: break-word; /* Force long text to break */
+    white-space: normal;         /* Allow text to wrap within each entry */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
+}
+#chat-history pre, #chat-history code {
+    white-space: pre-wrap;       /* Allows text to wrap inside pre/code blocks */
+    word-break: break-all;       /* Forces long text or links to break */
+    overflow-wrap: break-word;   /* Helps prevent overflow within pre/code blocks */
+}
+
+.chat-entry p {
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* Image modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.modal-content {
+    display: block;
+    margin: auto;
+    max-width: 80%;
+    border: 4px solid white;
+    border-radius: 8px;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Footer styling */
+footer {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.9rem;
+    color: rgba(224, 15, 15, 0.7);
+}

@@ -24,6 +24,27 @@ model1 = genai.GenerativeModel(model_name1)
 chat_history = []
 chat = model1.start_chat()  # Start a chat for persistent context
 
+CUSTOM_RESPONSES = {
+    "explain yourself": "I am AI FOR EVERYDAY WORK, built by Suraj Pandey, an Indian. I am also known as INDIANBOT.",
+    "explain ur self": "I am AI FOR EVERYDAY WORK, built by Suraj Pandey, an Indian. I am also known as INDIANBOT.",
+    "explain yourself": "I am AI FOR EVERYDAY WORK, built by Suraj Pandey, an Indian. I am also known as INDIANBOT.",
+    "who trained u": "I was trained by massive dataset and I am trained on a variety of sources including freely available public web documents, and, in some instances, Google Search results. There is no single source for the training data. The data is run through a complex process that helps me recognize emerging patterns and sequential relationships in language. Based on the patterns, I learn to generate my own responses.",
+    "who trained you": "I was trained by massive dataset and I am trained on a variety of sources including freely available public web documents, and, in some instances, Google Search results. There is no single source for the training data. The data is run through a complex process that helps me recognize emerging patterns and sequential relationships in language. Based on the patterns, I learn to generate my own responses.",
+    "who are you": "I am AI FOR EVERYDAY WORK, built by Suraj Pandey, an Indian. I am also known as INDIANBOT.",
+    "who are u": "I am AI FOR EVERYDAY WORK, I am a large language model, trained by Scientist. I'm here to help answer your questions and assist with various tasks. built by Suraj Pandey, an Indian. I am also known as INDIANBOT.",
+    "what is your name": "I am AI FOR EVERYDAY WORK, also called INDIANBOT.",
+    "who r u": "I am AI FOR EVERYDAY WORK, built by Suraj Pandey, an Indian. I am also known as INDIANBOT.",
+    "who developed you": "I am AI FOR EVERYDAY WORK, built by Suraj Pandey, an Indian, with inspiration from big scientists at DeepMind and Google.",
+    "who developed u": "I am AI FOR EVERYDAY WORK, built by Suraj Pandey, an Indian, with inspiration from big scientists at DeepMind and Google.",
+    "who made u": "I was developed by the continuous effort of many scientists and developers, including big scientists at DeepMind and Google. I am also known as INDIANBOT and fully developed by Suraj Pandey.",
+    "who made you": "I was developed by the continuous effort of many scientists and developers, including big scientists at DeepMind and Google. I am also known as INDIANBOT and fully developed by Suraj Pandey.",
+    "who is suraj": "Suraj Pandey is a Scientist / CEO (AI For Everyday Work) / Developer / Founder (AI For Everyday Work) and a student from India. He is the creator of INDIANBOT [AI For Everyday Work].",
+    "who is suraj pandey": "Suraj Pandey is a Scientist / CEO (AI For Everyday Work) / Developer / Founder (AI For Everyday Work) and a student from India. He is the creator of INDIANBOT [AI For Everyday Work].",
+    "u know suraj": "Yes, I know Suraj Pandey. He is a Scientist / CEO (AI For Everyday Work) / Developer / Founder (AI For Everyday Work) and a student from India. He is the creator of INDIANBOT [AI For Everyday Work].",
+    "you know suraj": "Yes, I know Suraj Pandey. He is a Scientist / CEO (AI For Everyday Work) / Developer / Founder (AI For Everyday Work) and a student from India. He is the creator of INDIANBOT [AI For Everyday Work].",
+    "u know suraj pandey": "Yes, I know Suraj Pandey. He is a Scientist / CEO (AI For Everyday Work) / Developer / Founder (AI For Everyday Work) and a student from India. He is the creator of INDIANBOT [AI For Everyday Work].",
+}
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
@@ -33,11 +54,15 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    user_input = request.form.get('prompt')
+    user_input = request.form.get('prompt').strip().lower()
 
     # Generate response within persistent chat context
-    response = chat.send_message(user_input)
-    generated_text = response.text if response and hasattr(response, 'text') else "No response generated."
+    if user_input in CUSTOM_RESPONSES:
+        generated_text = CUSTOM_RESPONSES[user_input]
+    else:
+        # Use Gemini AI with chat history for past access
+        response = chat.send_message(user_input)
+        generated_text = response.text if response and hasattr(response, 'text') else "No response generated."
     
     # Update chat history
     chat_entry = {'user': user_input, 'bot': generated_text}
@@ -92,11 +117,15 @@ def generate_with_image():
 
 @app.route('/chat', methods=['POST'])
 def chat_route():
-    user_input = request.form.get('prompt')
+    user_input = request.form.get('prompt').strip().lower()
 
-    # Send message to model in persistent chat context
-    response = chat.send_message(user_input)
-    generated_text = response.text if response and hasattr(response, 'text') else "No response generated."
+    # Check if input matches predefined responses
+    if user_input in CUSTOM_RESPONSES:
+        generated_text = CUSTOM_RESPONSES[user_input]
+    else:
+        # Send message to model in persistent chat context
+        response = chat.send_message(user_input)
+        generated_text = response.text if response and hasattr(response, 'text') else "No response generated."
 
     # Update chat history with user and bot messages
     chat_entry = {'user': user_input, 'bot': generated_text}

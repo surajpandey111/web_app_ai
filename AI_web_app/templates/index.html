@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI for Everyday Work</title>
+    <title>ResearchAI GPT</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <script defer src="{{ url_for('static', filename='js/scripts.js')}}"></script>
@@ -13,20 +13,20 @@
     <div id="gate-container">
         <div id="gate-left" class="gate"></div>
         <div id="gate-right" class="gate"></div>
-        <div id="welcome-text">Welcome to AI For Everyday Work</div>
+        <div id="welcome-text">ResearchAI GPT</div>
     </div>
             
     <div class="container">
-        <h1>AI For Everyday Work</h1>
+        <h1>ResearchAI GPT</h1>
         <div class="form-container">
             <form id="chat-form" class="form-input">
                 <input type="text" name="prompt" id="prompt" placeholder="Enter your prompt here" required>
-                <button type="submit">Generate</button>
+                <button type="submit">Ask</button>
             </form>
             <form id="upload-form" class="form-input" enctype="multipart/form-data">
                 <input type="text" name="prompt" id="upload-prompt" placeholder="Enter your prompt here" required>
                 <input id="file-input" type="file" name="file" accept="image/*">
-                <button type="submit">Generate with Image</button>
+                <button type="submit">Ask with Image</button>
             </form>
         </div>
         <h2>SERVICES</h2>

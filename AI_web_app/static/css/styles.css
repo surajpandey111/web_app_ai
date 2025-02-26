@@ -2,7 +2,7 @@
 body {
     margin: 0;
     font-family: 'Montserrat', sans-serif;
-    background: url('../background.png') no-repeat center center fixed;
+    background: url('../background.jpg') no-repeat center center fixed;
     background-size: cover;
     display: flex;
     justify-content: center;
@@ -223,12 +223,14 @@ footer {
     width: 100%;
     text-align: center;
     font-size: 1rem;
-    padding: 12px 0;
-    background: transparent; /* Fully transparent background */
-    color: rgba(207, 228, 12, 0.9); /* Bright text for visibility */
+    padding: 0;  /* Remove padding */
+    margin: 0;  /* Remove margin */
+    background: transparent;
+    color: rgba(207, 228, 12, 0.9);
     font-weight: bold;
     letter-spacing: 1px;
-    border-top: 2px solid rgba(207, 228, 12, 0.7); /* Optional subtle border */
+    border-top: none; /* Remove the line */
 }
+
 
 

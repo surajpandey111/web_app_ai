@@ -231,6 +231,12 @@ footer {
     letter-spacing: 1px;
     border-top: none; /* Remove the line */
 }
+pre {
+    white-space: normal; /* Allows wrapping */
+    word-break: break-word; /* Prevents breaking in awkward places */
+    overflow-wrap: break-word; /* Ensures long words wrap properly */
+    text-align: justify; /* Aligns text properly */
+}
 
 
 

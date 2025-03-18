@@ -8,8 +8,47 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <script defer src="{{ url_for('static', filename='js/scripts.js')}}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        #scroll-button {
+            position: fixed;
+            right: 10px;
+            bottom: 20px;
+            background-color:rgb(230, 112, 16);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .questions-container {
+            width: 100%;
+            padding: 10px;
+            border-bottom: 2px solid #ccc;
+        }
+        .answers-container {
+            width: 100%;
+            padding: 10px;
+        }
+        .goto-answer {
+            display: block;
+            margin-top: 5px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
+    <button id="scroll-button">Please Scroll Down for Answer</button>
     <div id="gate-container">
         <div id="gate-left" class="gate"></div>
         <div id="gate-right" class="gate"></div>
@@ -46,5 +85,17 @@
     <footer>
         <p>Developed by Suraj</p>
     </footer>
+    <script>
+        document.getElementById("scroll-button").addEventListener("click", function() {
+            document.getElementById("chat-history").scrollIntoView({ behavior: "smooth" });
+        });
+
+        document.querySelectorAll(".goto-answer").forEach(button => {
+            button.addEventListener("click", function() {
+                let targetId = this.getAttribute("data-target");
+                document.getElementById(targetId).scrollIntoView({ behavior: "smooth" });
+            });
+        });
+    </script>
 </body>
 </html>

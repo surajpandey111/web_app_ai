@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-HUB (FOR MULTILINGUAL IMAGE AND TEXT SUPPORT)</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>AI-HUB</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <script defer src="{{ url_for('static', filename='js/scripts.js')}}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
         body {
@@ -144,19 +142,6 @@
             border-radius: 24px;
             cursor: pointer;
         }
-        #scroll-button {
-            position: fixed;
-            right: 10px;
-            bottom: 20px;
-            background-color: rgb(230, 112, 16);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 14px;
-            z-index: 1000;
-        }
         #gate-container {
             position: fixed;
             top: 0;
@@ -222,20 +207,25 @@
             background-color: #202123;
             color: #8e8ea0;
         }
+        #image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            display: none;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
-    <button id="scroll-button">Please Scroll Down for Answer</button>
     <div id="gate-container">
         <div id="gate-left" class="gate"></div>
         <div id="gate-right" class="gate"></div>
-        <div id="welcome-text">AI-HUB (FOR MULTILINGUAL IMAGE AND TEXT SUPPORT)</div>
+        <div id="welcome-text">AI-HUB</div>
     </div>
             
     <div class="chat-wrapper">
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>AI-HUB (FOR MULTILINGUAL IMAGE AND TEXT SUPPORT)</h2>
+                <h2>AI-HUB</h2>
                 <button class="toggle-sidebar" id="toggle-sidebar">☰</button>
             </div>
             <div class="new-chat">
@@ -252,7 +242,7 @@
             <div class="conversation" id="conversation">
                 {% for entry in chat_history %}
                 <div class="message user-message">{{ entry.user }}</div>
-                <div class="message bot-message"><pre>{{ entry.bot }}</pre></div>
+                <div class="message bot-message">{{ entry.bot }}</div>
                 {% endfor %}
             </div>
             <div class="input-area">
@@ -264,6 +254,7 @@
                     <form id="upload-form" class="form-input" enctype="multipart/form-data">
                         <input type="text" name="prompt" id="upload-prompt" placeholder="Enter your prompt here" required>
                         <input id="file-input" type="file" name="file" accept="image/*">
+                        <img id="image-preview" alt="Preview">
                         <button type="submit">Ask with Image</button>
                     </form>
                 </div>
@@ -278,42 +269,113 @@
         <p>Developed by Suraj</p>
     </footer>
     <script>
-        document.getElementById("scroll-button").addEventListener("click", function() {
-            document.getElementById("conversation").scrollIntoView({ behavior: "smooth" });
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatForm = document.getElementById('chat-form');
+            const uploadForm = document.getElementById('upload-form');
+            const conversation = document.getElementById('conversation');
+            const fileInput = document.getElementById('file-input');
+            const imagePreview = document.getElementById('image-preview');
+            const imageModal = document.getElementById('image-modal');
+            const closeModal = document.getElementById('close-modal');
+            const gateContainer = document.getElementById('gate-container');
+            const toggleSidebar = document.getElementById('toggle-sidebar');
+            const newChatBtn = document.querySelector('.new-chat button');
 
-        document.getElementById("toggle-sidebar").addEventListener("click", function() {
-            document.getElementById("sidebar").classList.toggle("collapsed");
-        });
+            // Scroll to bottom initially
+            conversation.scrollTop = conversation.scrollHeight;
 
-        // Gate animation (assuming it's handled in scripts.js or add here if needed)
-        // For example:
-        window.addEventListener('load', function() {
+            // Gate animation
             setTimeout(() => {
                 document.getElementById('gate-left').style.transform = 'rotateY(-90deg)';
                 document.getElementById('gate-right').style.transform = 'rotateY(90deg)';
             }, 1000);
             setTimeout(() => {
-                document.getElementById('gate-container').style.display = 'none';
+                gateContainer.style.display = 'none';
             }, 2000);
-        });
 
-        // Modal handling (add if not in scripts.js)
-        var modal = document.getElementById("image-modal");
-        var closeModal = document.getElementById("close-modal");
-        closeModal.onclick = function() {
-            modal.style.display = "none";
-        }
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
+            // Toggle sidebar
+            toggleSidebar.addEventListener("click", function() {
+                document.getElementById("sidebar").classList.toggle("collapsed");
+            });
+
+            // New chat
+            newChatBtn.addEventListener('click', function() {
+                conversation.innerHTML = '';
+            });
+
+            // Chat form submission
+            chatForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const formData = new FormData(chatForm);
+                try {
+                    const response = await fetch("/generate", {
+                        method: "POST",
+                        body: formData
+                    });
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+                    appendMessage(data.user, 'user-message');
+                    appendMessage(data.bot, 'bot-message');
+                    chatForm.reset();
+                    conversation.scrollTop = conversation.scrollHeight;
+                } catch (error) {
+                    console.error('Error:', error);
+                    appendMessage('Error generating response', 'bot-message');
+                }
+            });
+
+            // File input preview
+            fileInput.addEventListener("change", () => {
+                const file = fileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = "block";
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Upload form submission
+            uploadForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const formData = new FormData(uploadForm);
+                try {
+                    const response = await fetch("/generate_with_image", {
+                        method: "POST",
+                        body: formData
+                    });
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+                    appendMessage(data.user, 'user-message');
+                    appendMessage(data.bot, 'bot-message');
+                    uploadForm.reset();
+                    imagePreview.style.display = "none";
+                    conversation.scrollTop = conversation.scrollHeight;
+                } catch (error) {
+                    console.error('Error:', error);
+                    appendMessage('Error generating response with image', 'bot-message');
+                }
+            });
+
+            function appendMessage(text, className) {
+                const messageDiv = document.createElement("div");
+                messageDiv.className = `message ${className}`;
+                messageDiv.textContent = text;
+                conversation.appendChild(messageDiv);
+                conversation.scrollTop = conversation.scrollHeight;
             }
-        }
 
-        // New chat button (placeholder)
-        document.querySelector('.new-chat button').addEventListener('click', function() {
-            // Clear conversation or start new
-            document.getElementById('conversation').innerHTML = '';
+            // Modal
+            closeModal.onclick = function() {
+                imageModal.style.display = "none";
+            };
+            window.onclick = function(event) {
+                if (event.target == imageModal) {
+                    imageModal.style.display = "none";
+                }
+            };
         });
     </script>
 </body>

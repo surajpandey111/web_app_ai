@@ -63,18 +63,19 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    user_input = request.form.get('prompt').strip().lower()
+    user_input_original = request.form.get('prompt', '').strip()
+    user_input = user_input_original.lower()
 
     # Generate response within persistent chat context
     if user_input in CUSTOM_RESPONSES:
         generated_text = CUSTOM_RESPONSES[user_input]
     else:
         # Use Gemini AI with chat history for past access
-        response = chat.send_message(user_input)
+        response = chat.send_message(user_input_original)
         generated_text = response.text if response and hasattr(response, 'text') else "No response generated."
     
     # Update chat history
-    chat_entry = {'user': user_input, 'bot': generated_text}
+    chat_entry = {'user': user_input_original, 'bot': generated_text}
     chat_history.append(chat_entry)
     return jsonify(chat_entry)
 
@@ -105,7 +106,7 @@ def upload_file():
 
 @app.route('/generate_with_image', methods=['POST'])
 def generate_with_image():
-    user_input = request.form.get('prompt')
+    user_input = request.form.get('prompt', '').strip()
     file = request.files.get('file')
     
     if file and allowed_file(file.filename):
@@ -126,18 +127,19 @@ def generate_with_image():
 
 @app.route('/chat', methods=['POST'])
 def chat_route():
-    user_input = request.form.get('prompt').strip().lower()
+    user_input_original = request.form.get('prompt', '').strip()
+    user_input = user_input_original.lower()
 
     # Check if input matches predefined responses
     if user_input in CUSTOM_RESPONSES:
         generated_text = CUSTOM_RESPONSES[user_input]
     else:
         # Send message to model in persistent chat context
-        response = chat.send_message(user_input)
+        response = chat.send_message(user_input_original)
         generated_text = response.text if response and hasattr(response, 'text') else "No response generated."
 
     # Update chat history with user and bot messages
-    chat_entry = {'user': user_input, 'bot': generated_text}
+    chat_entry = {'user': user_input_original, 'bot': generated_text}
     chat_history.append(chat_entry)
 
     return jsonify(chat_entry)

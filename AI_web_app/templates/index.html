@@ -213,6 +213,71 @@
             display: none;
             margin-left: 10px;
         }
+        @media (max-width: 768px) {
+            .chat-wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: absolute;
+                z-index: 50;
+                top: 0;
+                left: 0;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            .toggle-sidebar {
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 60;
+                background-color: #202123;
+                border: 1px solid #565869;
+                padding: 8px;
+                border-radius: 4px;
+            }
+            .main-chat {
+                width: 100%;
+                order: 2;
+            }
+            .conversation {
+                padding: 16px;
+                height: calc(100vh - 120px);
+            }
+            .input-area {
+                padding: 12px 16px;
+            }
+            .form-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .form-input {
+                min-width: auto;
+                width: 100%;
+            }
+            .form-input input[type="text"] {
+                width: calc(100% - 80px);
+            }
+            .form-input button {
+                width: auto;
+                min-width: 70px;
+            }
+            footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                padding: 5px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -279,6 +344,7 @@
             const closeModal = document.getElementById('close-modal');
             const gateContainer = document.getElementById('gate-container');
             const toggleSidebar = document.getElementById('toggle-sidebar');
+            const sidebar = document.getElementById('sidebar');
             const newChatBtn = document.querySelector('.new-chat button');
 
             // Scroll to bottom initially
@@ -295,7 +361,14 @@
 
             // Toggle sidebar
             toggleSidebar.addEventListener("click", function() {
-                document.getElementById("sidebar").classList.toggle("collapsed");
+                sidebar.classList.toggle("open");
+            });
+
+            // Close sidebar on outside click for mobile
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768 && !sidebar.contains(event.target) && !toggleSidebar.contains(event.target)) {
+                    sidebar.classList.remove("open");
+                }
             });
 
             // New chat

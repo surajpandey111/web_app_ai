@@ -3,17 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gyanm-The DeepAI</title>
+    <title>AI-HUB (FOR MULTILINGUAL IMAGE AND TEXT SUPPORT)</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <script defer src="{{ url_for('static', filename='js/scripts.js')}}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #343541;
+            color: #ececf1;
+        }
+        .chat-wrapper {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 260px;
+            background-color: #202123;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: 60px;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #565869;
+        }
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: #ececf1;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .new-chat {
+            padding: 16px;
+        }
+        .new-chat button {
+            width: 100%;
+            padding: 10px;
+            background-color: #343541;
+            color: #ececf1;
+            border: 1px solid #565869;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .history-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 16px;
+        }
+        .history-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: #8e8ea0;
+        }
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #343541;
+        }
+        .conversation {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        .user-message {
+            align-self: flex-end;
+            background-color: #10a37f;
+            color: white;
+        }
+        .bot-message {
+            align-self: flex-start;
+            background-color: #444654;
+            color: #ececf1;
+        }
+        .input-area {
+            padding: 16px;
+            border-top: 1px solid #565869;
+            background-color: #40414f;
+        }
+        .form-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .form-input {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-input input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 24px;
+            background-color: #40414f;
+            color: #ececf1;
+        }
+        .form-input input[type="file"] {
+            padding: 8px;
+            background-color: #565869;
+            color: #ececf1;
+            border: none;
+            border-radius: 6px;
+        }
+        .form-input button {
+            padding: 12px 20px;
+            background-color: #10a37f;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+        }
         #scroll-button {
             position: fixed;
             right: 10px;
             bottom: 20px;
-            background-color:rgb(230, 112, 16);
+            background-color: rgb(230, 112, 16);
             color: white;
             border: none;
             padding: 8px 12px;
@@ -22,28 +157,70 @@
             font-size: 14px;
             z-index: 1000;
         }
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .questions-container {
+        #gate-container {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 10px;
-            border-bottom: 2px solid #ccc;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
         }
-        .answers-container {
+        .gate {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background-color: #343541;
+        }
+        #gate-left {
+            left: 0;
+            transform-origin: left;
+        }
+        #gate-right {
+            right: 0;
+            transform-origin: right;
+        }
+        #welcome-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #ececf1;
+            z-index: 101;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
             width: 100%;
-            padding: 10px;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
         }
-        .goto-answer {
+        .modal-content {
+            margin: auto;
             display: block;
-            margin-top: 5px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 5px;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80%;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
             cursor: pointer;
-            border-radius: 5px;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #202123;
+            color: #8e8ea0;
         }
     </style>
 </head>
@@ -52,30 +229,45 @@
     <div id="gate-container">
         <div id="gate-left" class="gate"></div>
         <div id="gate-right" class="gate"></div>
-        <div id="welcome-text">Gyanm-The DeepAI</div>
+        <div id="welcome-text">AI-HUB (FOR MULTILINGUAL IMAGE AND TEXT SUPPORT)</div>
     </div>
             
-    <div class="container">
-        <h1>Gyanm-The DeepAI</h1>
-        <div class="form-container">
-            <form id="chat-form" class="form-input">
-                <input type="text" name="prompt" id="prompt" placeholder="Enter your prompt here" required>
-                <button type="submit">Ask</button>
-            </form>
-            <form id="upload-form" class="form-input" enctype="multipart/form-data">
-                <input type="text" name="prompt" id="upload-prompt" placeholder="Enter your prompt here" required>
-                <input id="file-input" type="file" name="file" accept="image/*">
-                <button type="submit">Ask with Image</button>
-            </form>
-        </div>
-        <h2>SERVICES</h2>
-        <div id="chat-history">
-            {% for entry in chat_history %}
-            <div class="chat-entry">
-                <p><strong>You:</strong> {{ entry.user }}</p>
-                <p><strong>AI:</strong><pre>{{ entry.bot }}</pre></p>
+    <div class="chat-wrapper">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>AI-HUB (FOR MULTILINGUAL IMAGE AND TEXT SUPPORT)</h2>
+                <button class="toggle-sidebar" id="toggle-sidebar">☰</button>
+            </div>
+            <div class="new-chat">
+                <button type="button">New Chat</button>
+            </div>
+            <div class="history-section">
+                <h3>History</h3>
+                <div id="chat-history-list">
+                    <!-- Past chat sessions can be listed here dynamically -->
                 </div>
-            {% endfor %}
+            </div>
+        </div>
+        <div class="main-chat">
+            <div class="conversation" id="conversation">
+                {% for entry in chat_history %}
+                <div class="message user-message">{{ entry.user }}</div>
+                <div class="message bot-message"><pre>{{ entry.bot }}</pre></div>
+                {% endfor %}
+            </div>
+            <div class="input-area">
+                <div class="form-container">
+                    <form id="chat-form" class="form-input">
+                        <input type="text" name="prompt" id="prompt" placeholder="Enter your prompt here" required>
+                        <button type="submit">Ask</button>
+                    </form>
+                    <form id="upload-form" class="form-input" enctype="multipart/form-data">
+                        <input type="text" name="prompt" id="upload-prompt" placeholder="Enter your prompt here" required>
+                        <input id="file-input" type="file" name="file" accept="image/*">
+                        <button type="submit">Ask with Image</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
     <div id="image-modal" class="modal">
@@ -87,14 +279,41 @@
     </footer>
     <script>
         document.getElementById("scroll-button").addEventListener("click", function() {
-            document.getElementById("chat-history").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("conversation").scrollIntoView({ behavior: "smooth" });
         });
 
-        document.querySelectorAll(".goto-answer").forEach(button => {
-            button.addEventListener("click", function() {
-                let targetId = this.getAttribute("data-target");
-                document.getElementById(targetId).scrollIntoView({ behavior: "smooth" });
-            });
+        document.getElementById("toggle-sidebar").addEventListener("click", function() {
+            document.getElementById("sidebar").classList.toggle("collapsed");
+        });
+
+        // Gate animation (assuming it's handled in scripts.js or add here if needed)
+        // For example:
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('gate-left').style.transform = 'rotateY(-90deg)';
+                document.getElementById('gate-right').style.transform = 'rotateY(90deg)';
+            }, 1000);
+            setTimeout(() => {
+                document.getElementById('gate-container').style.display = 'none';
+            }, 2000);
+        });
+
+        // Modal handling (add if not in scripts.js)
+        var modal = document.getElementById("image-modal");
+        var closeModal = document.getElementById("close-modal");
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // New chat button (placeholder)
+        document.querySelector('.new-chat button').addEventListener('click', function() {
+            // Clear conversation or start new
+            document.getElementById('conversation').innerHTML = '';
         });
     </script>
 </body>

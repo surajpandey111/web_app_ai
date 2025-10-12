@@ -6,6 +6,8 @@
     <title>AI-HUB</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.css">
     <style>
         body {
             margin: 0;
@@ -102,6 +104,31 @@
             align-self: flex-start;
             background-color: #444654;
             color: #ececf1;
+            border-bottom-left-radius: 4px;
+        }
+        .bot-message .markdown-body {
+            color: #ececf1;
+            font-family: inherit;
+        }
+        .bot-message .markdown-body h1, .bot-message .markdown-body h2, .bot-message .markdown-body h3, .bot-message .markdown-body h4, .bot-message .markdown-body h5, .bot-message .markdown-body h6 {
+            color: #ececf1;
+            font-weight: bold;
+        }
+        .bot-message pre {
+            background-color: #202123;
+            border-radius: 6px;
+            padding: 12px;
+            overflow-x: auto;
+            color: #f8f8f8;
+        }
+        .bot-message code {
+            background-color: rgba(255,255,255,0.1);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #10a37f;
+        }
+        .bot-message strong {
+            font-weight: bold;
         }
         .input-area {
             padding: 16px;
@@ -327,7 +354,7 @@
             <div class="conversation" id="conversation">
                 {% for entry in chat_history %}
                 <div class="message user-message">{{ entry.user }}</div>
-                <div class="message bot-message">{{ entry.bot }}</div>
+                <div class="message bot-message" data-markdown="{{ entry.bot }}"></div>
                 {% endfor %}
             </div>
             <div class="input-area">
@@ -366,6 +393,12 @@
             const toggleSidebar = document.getElementById('toggle-sidebar');
             const sidebar = document.getElementById('sidebar');
             const newChatBtn = document.querySelector('.new-chat button');
+
+            // Render initial Markdown
+            document.querySelectorAll('.bot-message[data-markdown]').forEach(el => {
+                el.innerHTML = marked.parse(el.getAttribute('data-markdown'));
+                el.classList.add('markdown-body');
+            });
 
             // Scroll to bottom initially
             conversation.scrollTop = conversation.scrollHeight;
@@ -408,12 +441,16 @@
                     if (!response.ok) throw new Error('Network response was not ok');
                     const data = await response.json();
                     appendMessage(data.user, 'user-message');
-                    appendMessage(data.bot, 'bot-message');
+                    const botDiv = appendMessage('', 'bot-message');
+                    botDiv.innerHTML = marked.parse(data.bot);
+                    botDiv.classList.add('markdown-body');
                     chatForm.reset();
                     conversation.scrollTop = conversation.scrollHeight;
                 } catch (error) {
                     console.error('Error:', error);
-                    appendMessage('Error generating response', 'bot-message');
+                    const botDiv = appendMessage('', 'bot-message');
+                    botDiv.innerHTML = marked.parse('Error generating response');
+                    botDiv.classList.add('markdown-body');
                 }
             });
 
@@ -442,22 +479,29 @@
                     if (!response.ok) throw new Error('Network response was not ok');
                     const data = await response.json();
                     appendMessage(data.user, 'user-message');
-                    appendMessage(data.bot, 'bot-message');
+                    const botDiv = appendMessage('', 'bot-message');
+                    botDiv.innerHTML = marked.parse(data.bot);
+                    botDiv.classList.add('markdown-body');
                     uploadForm.reset();
                     imagePreview.style.display = "none";
                     conversation.scrollTop = conversation.scrollHeight;
                 } catch (error) {
                     console.error('Error:', error);
-                    appendMessage('Error generating response with image', 'bot-message');
+                    const botDiv = appendMessage('', 'bot-message');
+                    botDiv.innerHTML = marked.parse('Error generating response with image');
+                    botDiv.classList.add('markdown-body');
                 }
             });
 
             function appendMessage(text, className) {
                 const messageDiv = document.createElement("div");
                 messageDiv.className = `message ${className}`;
-                messageDiv.textContent = text;
+                if (className.includes('user')) {
+                    messageDiv.textContent = text;
+                }
                 conversation.appendChild(messageDiv);
                 conversation.scrollTop = conversation.scrollHeight;
+                return messageDiv;
             }
 
             // Modal

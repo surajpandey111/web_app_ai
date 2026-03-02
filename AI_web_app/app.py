@@ -17,7 +17,7 @@ if not api_key:
     raise ValueError("API key is not set in the environment")
 
 genai.configure(api_key=api_key)
-model_name1 = 'gemini-2.5-flash'
+model_name1 = 'gemini-2.5-flash-lite'
 model1 = genai.GenerativeModel(model_name1)
 
 # Global chat history for display and persistent chat object for conversation context
